@@ -1,8 +1,14 @@
 flicks = {
-  "Flick1": {
-    "cmd":"Rundll32.exe User32.dll,LockWorkStation"
+  "C:\\ Drive": {
+    "cmd":"explorer.exe C:\\"
   },
-  "Flick2": {
-    "cmd":"powershell.exe \"Get-WmiObject -Class Win32_OperatingSystem -ComputerName . | % {$_.Lockout = $false;$_.put()}\""
+  "Lock Workstation": {
+  	"cmd":"Rundll32.exe User32.dll,LockWorkStation"
+  },
+  "Show Desktop": {
+    "cmd":"powershell -command \"& { $x = New-Object -ComObject Shell.Application; $x.minimizeall()  }\""
+  },
+  "Open Explorer": {
+    "cmd":"explorer.exe"
   }
 }
