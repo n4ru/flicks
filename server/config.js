@@ -5,8 +5,8 @@ flicks = {
   "Lock Workstation": {
   	"cmd":"Rundll32.exe User32.dll,LockWorkStation"
   },
-  "Show Desktop": {
-    "cmd":"powershell -command \"& { $x = New-Object -ComObject Shell.Application; $x.minimizeall()  }\""
+  "Toggle Desktop": {
+    "cmd":"powershell (New-Object -ComObject shell.application).toggleDesktop()"
   },
   "Open Explorer": {
     "cmd":"explorer.exe"
