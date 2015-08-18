@@ -15,6 +15,7 @@ flicks is a 3 part fully configurable and scriptable app that lets you quick lau
 - Download and extract the server.
 - Launch the server by running "node server.js". 
 - Take note of the IP and save it to the watchapp settings. 
+- Ensure your phone is on the same network as the server.
 
 Functions with both Pebble OG and Pebble Time.
 
