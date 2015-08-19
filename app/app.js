@@ -7,7 +7,7 @@ var Light = require('ui/light');
 var Settings = require('settings');
 
 var port = "3939";
-var reload = false; // If we're reloading, disable commands
+var reload = true; // If we're reloading, disable commands
 var flick = 'none'; // Current action
 var handlers = false; // Handlers not registered yet
 var flickNames = []; // Array of actions
@@ -77,7 +77,7 @@ var element = new UI.Text({
     textAlign: 'center',
     textOverflow: 'wrap',
     color: 'black',
-    text: 'Loading'
+    text: '---'
 });
 
 var title = new UI.TimeText({
@@ -112,15 +112,11 @@ wind.add(back);
 wind.add(icon);
 wind.add(title);
 wind.add(sidebar);
-wind.add(up);
-wind.add(down);
-wind.add(ell);
-wind.add(debug);
 wind.add(element);
 wind.add(getReturn);
+wind.add(debug);
 
 function flicked() {
-    getReturn.text('');
     debug.text('flick activated.');
     if (!reload) {
         ajax({
@@ -129,7 +125,7 @@ function flicked() {
             },
             function(data, status, request) {
                 wind.remove(error);
-                getReturn.text(data);
+                getReturn.text(data + '\n' + getReturn.text());
                 debug.text('flick executed.');
                 Vibe.vibrate('short');
             },
@@ -140,11 +136,14 @@ function flicked() {
 }
 
 function ajaxFailed() {
+    wind.remove(up);
+    wind.remove(down);
     wind.add(error);
+    element.text('---');
     debug.text('command failed.');
     Light.trigger();
     reload = true;
-    getReturn.text('[flicks: Connection Failure]');
+    getReturn.text('[disconnected.]' + '\n' + getReturn.text());
     Vibe.vibrate('short');
 }
 
@@ -154,11 +153,14 @@ function loadFlicks() {
             method: 'get'
         },
         function(data, status, request) {
+            wind.add(up);
+            wind.add(down);
             reload = false;
             wind.remove(error);
             flickNames = JSON.parse(data);
             flick = flickNames[0];
             element.text(flick);
+            getReturn.text('[connected.]' + '\n' + getReturn.text());
             debug.text('flicks loaded.');
             Vibe.vibrate('short');
 
@@ -192,11 +194,6 @@ function loadFlicks() {
                         flicked();
                     }
                 });
-                wind.on('longClick', 'select', function() {
-                    reload = true;
-                    debug.text("refreshing...");
-                    loadFlicks();
-                });
                 handlers = true;
             }
         },
@@ -205,8 +202,14 @@ function loadFlicks() {
         });
 }
 
-loadFlicks();
+wind.on('longClick', 'select', function() {
+    reload = true;
+    debug.text("refreshing...");
+    loadFlicks();
+});
 
+wind.add(ell);
+loadFlicks();
 Settings.config({
         url: 'http://n4ru.it/flicks/'
     },
