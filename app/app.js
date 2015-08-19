@@ -100,12 +100,12 @@ var debug = new UI.Text({
 });
 
 var getReturn = new UI.Text({
-    position: new Vector2(0, 54),
+    position: new Vector2(2, 54),
     size: new Vector2(124, 99),
     font: 'GOTHIC_18',
-    textAlign: 'center',
+    textAlign: 'left',
     color: 'black',
-    text: ''
+    text: '> started.'
 });
 
 wind.show();
@@ -115,7 +115,7 @@ wind.add(title);
 wind.add(sidebar);
 wind.add(element);
 wind.add(getReturn);
-wind.add(debug);
+//wind.add(debug);
 
 function flicked() {
     debug.text('flick activated.');
@@ -128,7 +128,7 @@ function flicked() {
             function(data, status, request) {
                 progress = false;
                 wind.remove(error);
-                getReturn.text(data + '\n' + getReturn.text());
+                getReturn.text('> ' + data + '\n' + getReturn.text());
                 debug.text('flick executed.');
                 Vibe.vibrate('short');
             },
@@ -147,11 +147,16 @@ function ajaxFailed() {
     debug.text('command failed.');
     Light.trigger();
     reload = true;
-    getReturn.text('[disconnected.]' + '\n' + getReturn.text());
+    getReturn.text('> disconnected.' + '\n' + getReturn.text());
     Vibe.vibrate('short');
 }
 
 function loadFlicks() {
+    reload = true;
+    debug.text("refreshing...");
+    wind.remove(up);
+    wind.remove(down);
+    element.text('---');
     ajax({
             url: "http://" + host + ':' + port + '?flick=none',
             method: 'get'
@@ -164,7 +169,7 @@ function loadFlicks() {
             flickNames = JSON.parse(data);
             flick = flickNames[0];
             element.text(flick);
-            getReturn.text('[connected.]' + '\n' + getReturn.text());
+            getReturn.text('> connected.' + '\n' + getReturn.text());
             debug.text('flicks loaded.');
             Vibe.vibrate('short');
 
@@ -207,8 +212,6 @@ function loadFlicks() {
 }
 
 wind.on('longClick', 'select', function() {
-    reload = true;
-    debug.text("refreshing...");
     loadFlicks();
 });
 

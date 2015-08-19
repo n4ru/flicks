@@ -32,7 +32,7 @@ http.createServer(function(request, response) {
 		if (query.flick && query.flick != "none") {
 			for (i in flickNames) {
 				if (query.flick == flickNames[i]) {
-					response.write("[success.]");
+					response.write("success.");
 					spawn.exec(flicks[flickNames[i]]["cmd"]);
 					console.log("Flicked.")
 				}
