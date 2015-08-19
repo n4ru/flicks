@@ -18,70 +18,149 @@ if (typeof Settings.option('host') === "undefined" || Settings.option('host') ==
 else
     var host = Settings.option('host');
 
-// Show Logo && Loading Text
 var wind = new UI.Window({
     fullscreen: true
 });
-var image = new UI.Image({
-    position: new Vector2(0, -30),
+
+// Logo
+var back = new UI.Rect({
+    position: new Vector2(0, 0),
     size: new Vector2(144, 168),
-    image: 'images/flicks.png'
+    backgroundColor: 'green'
 });
-var spinner = new UI.Image({
-    position: new Vector2(112, 0),
-    size: new Vector2(32, 32),
-    image: 'images/spin.png'
+
+// Sidebar
+var sidebar = new UI.Rect({
+    position: new Vector2(124, 0),
+    size: new Vector2(20, 168),
+    backgroundColor: 'black'
+});
+
+// Icons
+var icon = new UI.Rect({
+    position: new Vector2(0, 0),
+    size: new Vector2(124, 100),
+    backgroundColor: 'clear'
+});
+
+
+var error = new UI.Image({
+    position: new Vector2(129, 5),
+    size: new Vector2(11, 11),
+    image: 'images/x.png'
+});
+
+
+
+var up = new UI.Image({
+    position: new Vector2(129, 30),
+    size: new Vector2(12, 7),
+    image: 'images/action_bar_icon_up.png'
+});
+
+var down = new UI.Image({
+    position: new Vector2(129, 131),
+    size: new Vector2(12, 7),
+    image: 'images/action_bar_icon_down.png'
+});
+
+var ell = new UI.Image({
+    position: new Vector2(127, 82),
+    size: new Vector2(16, 4),
+    image: 'images/music_icon_ellipsis.png'
 });
 
 var element = new UI.Text({
-    position: new Vector2(0, 90),
-    size: new Vector2(144, 30),
-    font: 'GOTHIC_28_BOLD',
+    position: new Vector2(0, 24),
+    size: new Vector2(124, 30),
+    font: 'GOTHIC_24',
     textAlign: 'center',
-    textOverflow: 'wrap'
+    textOverflow: 'wrap',
+    color: 'black',
+    text: 'Loading'
 });
 
-wind.add(image);
-wind.add(element);
-wind.show();
+var title = new UI.TimeText({
+    position: new Vector2(0, 0),
+    size: new Vector2(124, 15),
+    font: 'GOTHIC_18',
+    color: 'black',
+    textAlign: 'center',
+    text: '%H:%M'
+});
 
-element.text("refreshing...");
+var debug = new UI.Text({
+    position: new Vector2(2, 153),
+    size: new Vector2(124, 15),
+    font: 'GOTHIC_14_BOLD',
+    textAlign: 'left',
+    color: 'black',
+    text: 'flicks revision 3'
+});
+
+var getReturn = new UI.Text({
+    position: new Vector2(0, 54),
+    size: new Vector2(124, 99),
+    font: 'GOTHIC_18',
+    textAlign: 'center',
+    color: 'black',
+    text: ''
+});
+
+wind.show();
+wind.add(back);
+wind.add(icon);
+wind.add(title);
+wind.add(sidebar);
+wind.add(up);
+wind.add(down);
+wind.add(ell);
+wind.add(debug);
+wind.add(element);
+wind.add(getReturn);
 
 function flicked() {
+    getReturn.text('');
+    debug.text('flick activated.');
     if (!reload) {
-        wind.add(spinner);
         ajax({
                 url: "http://" + host + ':' + port + '?flick=' + encodeURIComponent(flick),
                 method: 'get'
             },
             function(data, status, request) {
-                wind.remove(spinner);
+                wind.remove(error);
+                getReturn.text(data);
+                debug.text('flick executed.');
                 Vibe.vibrate('short');
             },
             function(error, status, request) {
-                element.color("red");
-                element.text("flicks disconnected!");
-                reload = true;
-                Light.trigger();
+                ajaxFailed();
             });
     }
 }
 
+function ajaxFailed() {
+    wind.add(error);
+    debug.text('command failed.');
+    Light.trigger();
+    reload = true;
+    getReturn.text('[flicks: Connection Failure]');
+    Vibe.vibrate('short');
+}
+
 function loadFlicks() {
-    wind.add(spinner);
     ajax({
             url: "http://" + host + ':' + port + '?flick=none',
             method: 'get'
         },
         function(data, status, request) {
             reload = false;
-            wind.remove(spinner);
-            element.color("green");
+            wind.remove(error);
             flickNames = JSON.parse(data);
             flick = flickNames[0];
             element.text(flick);
+            debug.text('flicks loaded.');
             Vibe.vibrate('short');
-
 
             // Register Handlers
             if (!handlers) {
@@ -110,21 +189,19 @@ function loadFlicks() {
                 });
                 wind.on('click', 'select', function() {
                     if (!reload) {
-						flicked();
+                        flicked();
                     }
                 });
                 wind.on('longClick', 'select', function() {
                     reload = true;
-                    element.text("refreshing...");
+                    debug.text("refreshing...");
                     loadFlicks();
                 });
                 handlers = true;
             }
         },
         function(error, status, request) {
-            element.color("red");
-            element.text("flicks misconfigured");
-            Light.trigger();
+            ajaxFailed();
         });
 }
 
@@ -136,7 +213,7 @@ Settings.config({
     function(e) {
         Settings.option('host', e.options.host);
         reload = true;
-        element.text("refreshing...");
+        debug.text("refreshing...");
         host = Settings.option('host');
         loadFlicks();
     }
