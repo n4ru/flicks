@@ -8,14 +8,7 @@
     "success":"workstation locked."
   },
   "GitLab": {
-  	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/iristechnology/AdCabs\")",
+  	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/n4ru\")",
   	"success":"gitlab opened."
   },
-  "Serve AdCabs": {
-    "cmd":"start ionic.bat",
-    "success":"ionic served."
-  },
-  "Sublime Text": {
-    "cmd":"sublime.bat"
-  }
 }
