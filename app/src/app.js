@@ -124,23 +124,28 @@ wind.add(getReturn);
 function flicked() {
     debug.text('flick activated.');
     if (!reload && !progress) {
-		progress = true;
-		wind.remove(up);
-		wind.remove(down);
-		wind.add(prog);
+        progress = true;
+        wind.remove(up);
+        wind.remove(down);
+        wind.add(prog);
         ajax({
                 url: "http://" + host + ':' + port + '?flick=' + encodeURIComponent(flick),
                 method: 'get'
             },
             function(data, status, request) {
-				wind.add(up);
-				wind.add(down);
-				wind.remove(prog);
-                wind.remove(error);
-				progress = false;
-                getReturn.text(('> ' + data + '\n' + getReturn.text()).substring(0, 1024));
-                debug.text('flick executed.');
-                Vibe.vibrate('short');
+                if (data == ".update") {
+                    getReturn.text(('> refreshing.' + '\n' + getReturn.text()).substring(0, 1024));
+                    loadFlicks();
+                } else {
+                    wind.add(up);
+                    wind.add(down);
+                    wind.remove(prog);
+                    wind.remove(error);
+                    progress = false;
+                    getReturn.text(('> ' + data + '\n' + getReturn.text()).substring(0, 1024));
+                    debug.text('flick executed.');
+                    Vibe.vibrate('short');
+                }
             },
             function(error, status, request) {
                 ajaxFailed();
@@ -149,12 +154,12 @@ function flicked() {
 }
 
 function ajaxFailed() {
-	wind.remove(prog);
+    wind.remove(prog);
     wind.remove(up);
     wind.remove(down);
     wind.add(error);
     reload = true;
-	progress = false;
+    progress = false;
     element.text('---');
     debug.text('command failed.');
     getReturn.text(('> disconnected.' + '\n' + getReturn.text()).substring(0, 1024));
@@ -163,7 +168,7 @@ function ajaxFailed() {
 
 function loadFlicks() {
     reload = true;
-	wind.add(prog);
+    wind.add(prog);
     debug.text("refreshing...");
     wind.remove(up);
     wind.remove(down);
@@ -173,7 +178,7 @@ function loadFlicks() {
             method: 'get'
         },
         function(data, status, request) {
-			wind.remove(prog);
+            wind.remove(prog);
             wind.add(up);
             wind.add(down);
             reload = false;
@@ -191,7 +196,7 @@ function loadFlicks() {
                 Accel.init();
                 Accel.on('tap', function(e) {
                     if (!reload && !progress) {
-						flicked();
+                        flicked();
                     }
                 });
                 wind.on('click', 'up', function() {
@@ -226,7 +231,7 @@ function loadFlicks() {
 }
 
 wind.on('longClick', 'select', function() {
-	loadFlicks();
+    loadFlicks();
 });
 
 wind.add(ell);

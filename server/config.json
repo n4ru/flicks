@@ -10,5 +10,5 @@
   "GitLab": {
   	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/n4ru\")",
   	"success":"gitlab opened."
-  },
+  }
 }
