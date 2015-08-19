@@ -6,6 +6,7 @@ var Vector2 = require('vector2');
 var Light = require('ui/light');
 var Settings = require('settings');
 
+var progress = false;
 var port = "3939";
 var reload = true; // If we're reloading, disable commands
 var flick = 'none'; // Current action
@@ -118,18 +119,21 @@ wind.add(debug);
 
 function flicked() {
     debug.text('flick activated.');
-    if (!reload) {
+    if (!reload && !progress) {
+        progress = true;
         ajax({
                 url: "http://" + host + ':' + port + '?flick=' + encodeURIComponent(flick),
                 method: 'get'
             },
             function(data, status, request) {
+                progress = false;
                 wind.remove(error);
                 getReturn.text(data + '\n' + getReturn.text());
                 debug.text('flick executed.');
                 Vibe.vibrate('short');
             },
             function(error, status, request) {
+                progress = false;
                 ajaxFailed();
             });
     }
