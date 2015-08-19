@@ -3,9 +3,9 @@ var ajax = require('ajax');
 var Vibe = require('ui/vibe');
 var UI = require('ui');
 var Vector2 = require('vector2');
-var Light = require('ui/light');
 var Settings = require('settings');
 
+var version = 'r4';
 var progress = false;
 var port = "3939";
 var reload = true; // If we're reloading, disable commands
@@ -51,7 +51,11 @@ var error = new UI.Image({
     image: 'images/x.png'
 });
 
-
+var prog = new UI.Image({
+    position: new Vector2(129, 153),
+    size: new Vector2(10, 10),
+    image: 'images/c.png'
+});
 
 var up = new UI.Image({
     position: new Vector2(129, 30),
@@ -96,7 +100,7 @@ var debug = new UI.Text({
     font: 'GOTHIC_14_BOLD',
     textAlign: 'left',
     color: 'black',
-    text: 'flicks revision 3'
+    text: version
 });
 
 var getReturn = new UI.Text({
@@ -120,39 +124,46 @@ wind.add(getReturn);
 function flicked() {
     debug.text('flick activated.');
     if (!reload && !progress) {
-        progress = true;
+		progress = true;
+		wind.remove(up);
+		wind.remove(down);
+		wind.add(prog);
         ajax({
                 url: "http://" + host + ':' + port + '?flick=' + encodeURIComponent(flick),
                 method: 'get'
             },
             function(data, status, request) {
-                progress = false;
+				wind.add(up);
+				wind.add(down);
+				wind.remove(prog);
                 wind.remove(error);
-                getReturn.text('> ' + data + '\n' + getReturn.text());
+				progress = false;
+                getReturn.text(('> ' + data + '\n' + getReturn.text()).substring(0, 1024));
                 debug.text('flick executed.');
                 Vibe.vibrate('short');
             },
             function(error, status, request) {
-                progress = false;
                 ajaxFailed();
             });
     }
 }
 
 function ajaxFailed() {
+	wind.remove(prog);
     wind.remove(up);
     wind.remove(down);
     wind.add(error);
+    reload = true;
+	progress = false;
     element.text('---');
     debug.text('command failed.');
-    Light.trigger();
-    reload = true;
-    getReturn.text('> disconnected.' + '\n' + getReturn.text());
+    getReturn.text(('> disconnected.' + '\n' + getReturn.text()).substring(0, 1024));
     Vibe.vibrate('short');
 }
 
 function loadFlicks() {
     reload = true;
+	wind.add(prog);
     debug.text("refreshing...");
     wind.remove(up);
     wind.remove(down);
@@ -162,6 +173,7 @@ function loadFlicks() {
             method: 'get'
         },
         function(data, status, request) {
+			wind.remove(prog);
             wind.add(up);
             wind.add(down);
             reload = false;
@@ -169,7 +181,7 @@ function loadFlicks() {
             flickNames = JSON.parse(data);
             flick = flickNames[0];
             element.text(flick);
-            getReturn.text('> connected.' + '\n' + getReturn.text());
+            getReturn.text(('> connected.' + '\n' + getReturn.text()).substring(0, 1024));
             debug.text('flicks loaded.');
             Vibe.vibrate('short');
 
@@ -178,10 +190,12 @@ function loadFlicks() {
                 // Wrist Flick
                 Accel.init();
                 Accel.on('tap', function(e) {
-                    flicked();
+                    if (!reload && !progress) {
+						flicked();
+                    }
                 });
                 wind.on('click', 'up', function() {
-                    if (!reload) {
+                    if (!reload && !progress) {
                         if (typeof flickNames[flickNames.indexOf(flick) + 1] === 'undefined')
                             flick = flickNames[0];
                         else
@@ -190,7 +204,7 @@ function loadFlicks() {
                     }
                 });
                 wind.on('click', 'down', function() {
-                    if (!reload) {
+                    if (!reload && !progress) {
                         if (typeof flickNames[flickNames.indexOf(flick) - 1] === 'undefined')
                             flick = flickNames[flickNames.length - 1];
                         else
@@ -199,7 +213,7 @@ function loadFlicks() {
                     }
                 });
                 wind.on('click', 'select', function() {
-                    if (!reload) {
+                    if (!reload && !progress) {
                         flicked();
                     }
                 });
@@ -212,17 +226,17 @@ function loadFlicks() {
 }
 
 wind.on('longClick', 'select', function() {
-    loadFlicks();
+	loadFlicks();
 });
 
 wind.add(ell);
 loadFlicks();
+
 Settings.config({
         url: 'http://n4ru.it/flicks/'
     },
     function(e) {
         Settings.option('host', e.options.host);
-        reload = true;
         debug.text("refreshing...");
         host = Settings.option('host');
         loadFlicks();

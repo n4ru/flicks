@@ -1,0 +1,21 @@
+{
+  "Toggle Desktop": {
+    "cmd":"powershell (New-Object -ComObject shell.application).toggleDesktop()",
+    "success":"desktop toggled."
+  },
+  "Lock Workstation": {
+    "cmd":"Rundll32.exe User32.dll,LockWorkStation",
+    "success":"workstation locked."
+  },
+  "GitLab": {
+  	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/iristechnology/AdCabs\")",
+  	"success":"gitlab opened."
+  },
+  "Serve AdCabs": {
+    "cmd":"start ionic.bat",
+    "success":"ionic served."
+  },
+  "Sublime Text": {
+    "cmd":"sublime.bat"
+  }
+}

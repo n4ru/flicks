@@ -1,0 +1,83 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        "configurable"
+    ],
+    "companyName": "n4ru",
+    "longName": "flicks",
+    "projectType": "pebblejs",
+    "resources": {
+        "media": [
+            {
+                "file": "images/menu_icon.png",
+                "menuIcon": true,
+                "name": "IMAGE_MENU_ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/logo_splash.png",
+                "name": "IMAGE_LOGO_SPLASH",
+                "type": "png"
+            },
+            {
+                "file": "images/tile_splash.png",
+                "name": "IMAGE_TILE_SPLASH",
+                "type": "png"
+            },
+            {
+                "file": "fonts/UbuntuMono-Regular.ttf",
+                "name": "MONO_FONT_14",
+                "type": "font"
+            },
+            {
+                "file": "images/c.png",
+                "name": "IMAGES_C_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/a.png",
+                "name": "IMAGES_A_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/splash.png",
+                "name": "IMAGES_SPLASH_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/x.png",
+                "name": "IMAGES_X_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/action_bar_icon_dismissbw.png",
+                "name": "IMAGES_ACTION_BAR_ICON_DISMISSBW_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/music_icon_ellipsis.png",
+                "name": "IMAGES_MUSIC_ICON_ELLIPSIS_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/action_bar_icon_up.png",
+                "name": "IMAGES_ACTION_BAR_ICON_UP_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/action_bar_icon_down.png",
+                "name": "IMAGES_ACTION_BAR_ICON_DOWN_PNG",
+                "type": "png"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "flicks",
+    "uuid": "681a5956-9f3c-4dfe-9628-7e9bf128b46f",
+    "versionCode": 1,
+    "versionLabel": "0.03",
+    "watchapp": {
+        "hiddenApp": false,
+        "watchface": false
+    }
+}

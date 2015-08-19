@@ -6,7 +6,7 @@ var qs = require('querystring');
 var user = "null";
 var serverPort = 3939;
 var os = require('os');
-require('./config.js');
+var flicks = require('./config.json');
 var interfaces = os.networkInterfaces();
 var addresses = [];
 for (var k in interfaces) {
@@ -32,15 +32,21 @@ http.createServer(function(request, response) {
 		if (query.flick && query.flick != "none") {
 			for (i in flickNames) {
 				if (query.flick == flickNames[i]) {
-					response.write("success.");
 					spawn.exec(flicks[flickNames[i]]["cmd"]);
-					console.log("Flicked.")
+					if (typeof flicks[flickNames[i]]["success"] === "undefined") {
+						response.write("success.");
+						console.log("success.");
+					} else {
+						response.write(flicks[flickNames[i]]["success"]);
+						console.log(flicks[flickNames[i]]["success"]);
+					}
+					response.end();
 				}
 			}
 		} else if (query.flick && query.flick == "none")  {
 			response.write(JSON.stringify(flickNames));
+			response.end();
 		}
-		response.end();
 	}
 }).listen(serverPort);
 console.log(addresses + ':' + serverPort + ' is ready for Flicks!');
