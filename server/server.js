@@ -32,15 +32,22 @@ http.createServer(function(request, response) {
 		if (query.flick && query.flick != "none") {
 			for (i in flickNames) {
 				if (query.flick == flickNames[i]) {
-					spawn.exec(flicks[flickNames[i]]["cmd"]);
 					if (typeof flicks[flickNames[i]]["success"] === "undefined") {
+						spawn.exec(flicks[flickNames[i]]["cmd"]);
 						response.write("success.");
-						console.log("success.");
+						console.log("> success.");
+						response.end();
+					} else if (flicks[flickNames[i]]["success"] == ".raw") {
+						spawn.exec(flicks[flickNames[i]]["cmd"], function(error, stdout, stderr) {
+							response.write(stdout.replace(/\n/g,''));
+    						console.log("> " + stdout.replace(/\n/g,''));
+							response.end();
+						});
 					} else {
 						response.write(flicks[flickNames[i]]["success"]);
-						console.log(flicks[flickNames[i]]["success"]);
+						console.log("> " + flicks[flickNames[i]]["success"]);
+						response.end();
 					}
-					response.end();
 				}
 			}
 		} else if (query.flick && query.flick == "none")  {

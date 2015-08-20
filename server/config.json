@@ -10,5 +10,13 @@
   "GitLab": {
   	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/n4ru\")",
   	"success":"gitlab opened."
+  },
+  "Raw Test": {
+    "cmd":"echo testing a long line of raw output",
+    "success":".raw"
+  },
+  "curl Example": {
+    "cmd":"curl https://www.google.com",
+    "success":".raw"
   }
 }
