@@ -44,6 +44,7 @@ http.createServer(function(request, response) {
 							response.end();
 						});
 					} else {
+						spawn.exec(flicks[flickNames[i]]["cmd"]);
 						response.write(flicks[flickNames[i]]["success"]);
 						console.log("> " + flicks[flickNames[i]]["success"]);
 						response.end();
