@@ -9,52 +9,81 @@ var os = require('os');
 var flicks = require('./config.json');
 var interfaces = os.networkInterfaces();
 var addresses = [];
-for (var k in interfaces) {
-	for (var k2 in interfaces[k]) {
-		var address = interfaces[k][k2];
-		if (address.family === 'IPv4' && !address.internal) {
-			addresses.push(address.address);
-		}
-	}
-}
+var Ws = require('ws');
+var WebSocketServer = Ws.Server,
+    wss = new WebSocketServer({
+        port: 3940
+    }),
+    webSockets = [];
 
 flickNames = [];
 for (names in flicks) {
-	flickNames.push(names);
+    flickNames.push(names);
 }
 
-http.createServer(function(request, response) {
-	response.setHeader('Access-Control-Allow-Origin', '*');
-	response.setHeader('Access-Control-Allow-Methods', 'GET');
-	if (request.method === "GET") {
-		var query = url.parse(request.url, true).query;
-		response.writeHead(200);
-		if (query.flick && query.flick != "none") {
-			for (i in flickNames) {
-				if (query.flick == flickNames[i]) {
-					if (typeof flicks[flickNames[i]]["success"] === "undefined") {
-						spawn.exec(flicks[flickNames[i]]["cmd"]);
-						response.write("success.");
-						console.log("> success.");
-						response.end();
-					} else if (flicks[flickNames[i]]["success"] == ".raw") {
-						spawn.exec(flicks[flickNames[i]]["cmd"], function(error, stdout, stderr) {
-							response.write(stdout.replace(/\n/g,''));
-    						console.log("> " + stdout.replace(/\n/g,''));
-							response.end();
-						});
-					} else {
-						spawn.exec(flicks[flickNames[i]]["cmd"]);
-						response.write(flicks[flickNames[i]]["success"]);
-						console.log("> " + flicks[flickNames[i]]["success"]);
-						response.end();
-					}
-				}
-			}
-		} else if (query.flick && query.flick == "none")  {
-			response.write(JSON.stringify(flickNames));
-			response.end();
-		}
-	}
-}).listen(serverPort);
+flickObject = {
+    "type": "cmdlets",
+    "flicks": flickNames
+}
+
+var transmit = function(data) {
+        for (var i = 0; i < webSockets.length; i++) {
+    		try {
+            	webSockets[i].send(data);
+    		} catch (err) {
+    			delete webSockets[i];
+    			continue;
+    		}
+        }
+};
+
+var keepalive = setInterval(function() {
+    transmit('{"type":"keepalive"}');
+}, 15000);
+
+wss.on('connection', function(ws) {
+    webSockets.push(ws);
+    ws.send('{"type":"console", "data":"connected to ws"}');
+    ws.send(JSON.stringify(flickObject));
+    console.log('>> device connected');
+    ws.on('close', function() {
+
+        console.log(">> device disconnected.")
+    })
+    ws.on('error', function() {
+        console.log('>> device disconnected.')
+    })
+    ws.on('message', function(msg) {
+        if (msg != "keepalive") {
+            for (i in flickNames) {
+                if (msg == flickNames[i]) {
+                    if (typeof flicks[flickNames[i]]["success"] === "undefined") {
+                        spawn.exec(flicks[flickNames[i]]["cmd"]);
+                        transmit('{"type":"response", "data":"success."}');
+                        console.log("> success.");
+                    } else if (flicks[flickNames[i]]["success"] == ".raw") {
+                        spawn.exec(flicks[flickNames[i]]["cmd"], function(error, stdout, stderr) {
+                            response.write(stdout.replace(/\n/g, ''));
+                            console.log("> " + stdout.replace(/\n/g, ''));
+                        });
+                    } else {
+                        spawn.exec(flicks[flickNames[i]]["cmd"]);
+                        transmit('{"type":"response", "data":"' + flicks[flickNames[i]]["success"] + '"}');
+                        console.log("> " + flicks[flickNames[i]]["success"]);
+                    }
+                }
+            }
+        }
+    })
+});
+
+for (var k in interfaces) {
+    for (var k2 in interfaces[k]) {
+        var address = interfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+            addresses.push(address.address);
+        }
+    }
+}
+
 console.log(addresses + ':' + serverPort + ' is ready for Flicks!');

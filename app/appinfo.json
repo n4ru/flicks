@@ -75,7 +75,7 @@
     "shortName": "flicks",
     "uuid": "681a5956-9f3c-4dfe-9628-7e9bf128b46f",
     "versionCode": 1,
-    "versionLabel": "0.03",
+    "versionLabel": "0.05",
     "watchapp": {
         "hiddenApp": false,
         "watchface": false

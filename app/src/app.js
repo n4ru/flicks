@@ -1,13 +1,12 @@
 var Accel = require('ui/accel');
-var ajax = require('ajax');
 var Vibe = require('ui/vibe');
 var UI = require('ui');
 var Vector2 = require('vector2');
 var Settings = require('settings');
 
-var version = 'r4';
+var timeOut = '';
+var version = '>> ';
 var progress = false;
-var port = "3939";
 var reload = true; // If we're reloading, disable commands
 var flick = 'none'; // Current action
 var handlers = false; // Handlers not registered yet
@@ -76,37 +75,36 @@ var ell = new UI.Image({
 });
 
 var element = new UI.Text({
-    position: new Vector2(0, 24),
-    size: new Vector2(124, 30),
+    position: new Vector2(0, -3),
+    size: new Vector2(124, 10),
     font: 'GOTHIC_24',
     textAlign: 'center',
-    textOverflow: 'wrap',
     color: 'black',
     text: '---'
 });
 
-var title = new UI.TimeText({
-    position: new Vector2(0, 0),
-    size: new Vector2(124, 15),
-    font: 'GOTHIC_18',
+var debug = new UI.Text({
+    position: new Vector2(2, 148),
+    size: new Vector2(124, 20),
+    font: 'GOTHIC_14',
+    textAlign: 'left',
     color: 'black',
-    textAlign: 'center',
-    text: '%H:%M'
+    text: version
 });
 
-var debug = new UI.Text({
-    position: new Vector2(2, 153),
-    size: new Vector2(124, 15),
-    font: 'GOTHIC_14_BOLD',
+var cons = new UI.Text({
+    position: new Vector2(2, 148),
+    size: new Vector2(124, 20),
+    font: 'GOTHIC_14',
     textAlign: 'left',
     color: 'black',
     text: version
 });
 
 var getReturn = new UI.Text({
-    position: new Vector2(2, 54),
-    size: new Vector2(124, 99),
-    font: 'GOTHIC_18',
+    position: new Vector2(2, 22),
+    size: new Vector2(124, 123),
+    font: 'GOTHIC_14',
     textAlign: 'left',
     color: 'black',
     text: '> started.'
@@ -115,45 +113,60 @@ var getReturn = new UI.Text({
 wind.show();
 wind.add(back);
 wind.add(icon);
-wind.add(title);
 wind.add(sidebar);
 wind.add(element);
 wind.add(getReturn);
-//wind.add(debug);
+wind.add(cons);
+
+// Register Handlers
+if (!handlers) {
+    // Wrist Flick
+    Accel.init();
+    Accel.on('tap', function(e) {
+        if (!reload && !progress) {
+            flicked();
+        }
+    });
+    wind.on('click', 'up', function() {
+        if (!reload && !progress) {
+            if (typeof flickNames[flickNames.indexOf(flick) + 1] === 'undefined')
+                flick = flickNames[0];
+            else
+                flick = flickNames[flickNames.indexOf(flick) + 1];
+            element.text(flick);
+        }
+    });
+    wind.on('click', 'down', function() {
+        if (!reload && !progress) {
+            if (typeof flickNames[flickNames.indexOf(flick) - 1] === 'undefined')
+                flick = flickNames[flickNames.length - 1];
+            else
+                flick = flickNames[flickNames.indexOf(flick) - 1];
+            element.text(flick);
+        }
+    });
+    handlers = true;
+}
+
+function resetTimeout() {
+	clearTimeout(timeOut);
+	timeOut = setTimeout(function() {
+		failed();
+	}, 20000);
+}
 
 function flicked() {
-    debug.text('flick activated.');
     if (!reload && !progress) {
         progress = true;
         wind.remove(up);
         wind.remove(down);
         wind.add(prog);
-        ajax({
-                url: "http://" + host + ':' + port + '?flick=' + encodeURIComponent(flick),
-                method: 'get'
-            },
-            function(data, status, request) {
-                if (data == ".update") {
-                    getReturn.text(('> refreshing.' + '\n' + getReturn.text()).substring(0, 1024));
-                    loadFlicks();
-                } else {
-                    wind.add(up);
-                    wind.add(down);
-                    wind.remove(prog);
-                    wind.remove(error);
-                    progress = false;
-                    getReturn.text(('> ' + data + '\n' + getReturn.text()).substring(0, 1024));
-                    debug.text('flick executed.');
-                    Vibe.vibrate('short');
-                }
-            },
-            function(error, status, request) {
-                ajaxFailed();
-            });
+        ws.send(flick);
+		resetTimeout();
     }
 }
 
-function ajaxFailed() {
+function failed() {
     wind.remove(prog);
     wind.remove(up);
     wind.remove(down);
@@ -161,88 +174,69 @@ function ajaxFailed() {
     reload = true;
     progress = false;
     element.text('---');
-    debug.text('command failed.');
+	cons.text('>> disconnected');
     getReturn.text(('> disconnected.' + '\n' + getReturn.text()).substring(0, 1024));
     Vibe.vibrate('short');
 }
 
 function loadFlicks() {
+    element.text('---');
+	if (typeof ws !== "undefined")
+		ws.close();
+    ws = new WebSocket('ws://' + host + ':3940');
+	ws.onmessage = function(event) {
+        var msg = JSON.parse(event.data);
+        resetTimeout();
+        wind.add(up);
+        wind.add(down);
+        wind.remove(prog);
+        wind.remove(error);
+        progress = false;
+        switch (msg.type) {
+            case 'cmdlets':
+                reload = false;
+                getReturn.text(('> connected.' + '\n' + getReturn.text()).substring(0, 1024));
+                flickNames = msg.flicks;
+                flick = flickNames[0];
+                element.text(flick);
+                Vibe.vibrate('short');
+                break;
+            case 'console':
+                cons.text('>> ' + msg.data);
+                Vibe.vibrate('short');
+                break;
+            case 'response':
+                getReturn.text(('> ' + msg.data + '\n' + getReturn.text()).substring(0, 1024));
+                debug.text('flick executed.');
+                Vibe.vibrate('short');
+                break;
+        }
+    };
     reload = true;
     wind.add(prog);
-    debug.text("refreshing...");
     wind.remove(up);
     wind.remove(down);
-    element.text('---');
-    ajax({
-            url: "http://" + host + ':' + port + '?flick=none',
-            method: 'get'
-        },
-        function(data, status, request) {
-            wind.remove(prog);
-            wind.add(up);
-            wind.add(down);
-            reload = false;
-            wind.remove(error);
-            flickNames = JSON.parse(data);
-            flick = flickNames[0];
-            element.text(flick);
-            getReturn.text(('> connected.' + '\n' + getReturn.text()).substring(0, 1024));
-            debug.text('flicks loaded.');
-            Vibe.vibrate('short');
-
-            // Register Handlers
-            if (!handlers) {
-                // Wrist Flick
-                Accel.init();
-                Accel.on('tap', function(e) {
-                    if (!reload && !progress) {
-                        flicked();
-                    }
-                });
-                wind.on('click', 'up', function() {
-                    if (!reload && !progress) {
-                        if (typeof flickNames[flickNames.indexOf(flick) + 1] === 'undefined')
-                            flick = flickNames[0];
-                        else
-                            flick = flickNames[flickNames.indexOf(flick) + 1];
-                        element.text(flick);
-                    }
-                });
-                wind.on('click', 'down', function() {
-                    if (!reload && !progress) {
-                        if (typeof flickNames[flickNames.indexOf(flick) - 1] === 'undefined')
-                            flick = flickNames[flickNames.length - 1];
-                        else
-                            flick = flickNames[flickNames.indexOf(flick) - 1];
-                        element.text(flick);
-                    }
-                });
-                wind.on('click', 'select', function() {
-                    if (!reload && !progress) {
-                        flicked();
-                    }
-                });
-                handlers = true;
-            }
-        },
-        function(error, status, request) {
-            ajaxFailed();
-        });
 }
+
+loadFlicks();
 
 wind.on('longClick', 'select', function() {
     loadFlicks();
 });
 
+wind.on('click', 'select', function() {
+    if (!reload && !progress) {
+        flicked();
+    }
+});
+
 wind.add(ell);
-loadFlicks();
 
 Settings.config({
         url: 'http://n4ru.it/flicks/'
     },
     function(e) {
         Settings.option('host', e.options.host);
-        debug.text("refreshing...");
         host = Settings.option('host');
         loadFlicks();
     }

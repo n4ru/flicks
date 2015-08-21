@@ -1,22 +1,30 @@
 {
   "Toggle Desktop": {
     "cmd":"powershell (New-Object -ComObject shell.application).toggleDesktop()",
-    "success":"desktop toggled."
+    "data":"custom",
+    "msg":"desktop toggled."
   },
   "Lock Workstation": {
     "cmd":"Rundll32.exe User32.dll,LockWorkStation",
-    "success":"workstation locked."
+    "data":"custom",
+    "msg":"workstation locked."
   },
   "GitLab": {
   	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/n4ru\")",
-  	"success":"gitlab opened."
+  	"data":"custom",
+    "msg":"gitlab opened."
   },
-  "Raw Test": {
-    "cmd":"echo testing a long line of raw output",
-    "success":".raw"
+  "Ionic Serve": {
+  	"cmd":"C:\\Users\\gkushnir\\Documents\\GitLab\\AdCabs\\test.bat",
+  	"data":"custom",
+    "msg":"ionic served."
   },
-  "curl Example": {
-    "cmd":"curl https://www.google.com",
-    "success":".raw"
+  "curl example": {
+    "cmd":"curl https://www.google.com/",
+    "data":"console"
+  },
+  "socket example": {
+    "cmd":"socket.bat",
+    "data":"socket"
   }
 }
