@@ -212,6 +212,7 @@ function loadFlicks() {
                 break;
         }
     };
+    resetTimeout();
     reload = true;
     wind.add(prog);
     wind.remove(up);
