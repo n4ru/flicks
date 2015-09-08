@@ -7,5 +7,9 @@
   },
   "GitLab": {
   	"cmd":"powershell (Start-Process \"chrome.exe\" \"https://gitlab.com/n4ru\")"
+  },
+  "ping localhost": {
+  	"cmd":"ping 127.0.0.1 -n 1 | FIND \"Reply\"",
+  	"success":".raw"
   }
 }
