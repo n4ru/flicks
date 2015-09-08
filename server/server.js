@@ -27,19 +27,19 @@ flickObject = {
 }
 
 var transmit = function(data) {
-        for (var i = 0; i < webSockets.length; i++) {
-    		try {
-            	webSockets[i].send(data);
-    		} catch (err) {
-    			delete webSockets[i];
-    			continue;
-    		}
+    for (var i = 0; i < webSockets.length; i++) {
+        try {
+            webSockets[i].send(data);
+        } catch (err) {
+            delete webSockets[i];
+            continue;
         }
+    }
 };
 
 var keepalive = setInterval(function() {
     transmit('{"type":"keepalive"}');
-}, 15000);
+}, 10000);
 
 wss.on('connection', function(ws) {
     webSockets.push(ws);
@@ -63,7 +63,17 @@ wss.on('connection', function(ws) {
                         console.log("> success.");
                     } else if (flicks[flickNames[i]]["success"] == ".raw") {
                         spawn.exec(flicks[flickNames[i]]["cmd"], function(error, stdout, stderr) {
-                            response.write(stdout.replace(/\n/g, ''));
+                            msg = stdout
+                                .replace(/\\n/g, "\\n")
+                                .replace(/\\'/g, "\\'")
+                                .replace(/\\"/g, '\\"')
+                                .replace(/\\&/g, "\\&")
+                                .replace(/\\r/g, "\\r")
+                                .replace(/\\t/g, "\\t")
+                                .replace(/\\b/g, "\\b")
+                                .replace(/\\f/g, "\\f")
+                                .replace(/\n$/g, "");
+                            transmit('{"type":"response", "data":' + JSON.stringify(msg) + '}');
                             console.log("> " + stdout.replace(/\n/g, ''));
                         });
                     } else {
