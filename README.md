@@ -17,7 +17,7 @@ Functions with both Pebble OG and Pebble Time.
 **Configuration and Scripting**
 
 The app itself will NOT function without the server being properly configured. When you launch the server, it should give you its IP. Enter ONLY the IP in flicks' settings (NO PORT, NO HTTP://).
-The config.js file is the meat of the application. It includes examples that should function on most Windows computers. flicks will work on any OS - modify the configuration any way you want - it's fairly self-explanatory but a full documentation will come within a few updates. There's no limit on how many functions you can implement. You can call entire scripts just like you would from the command line. Don't forget to restart server.js when you make changes to config.js!
+The config.json file is the meat of the application. It includes examples that should function on most Windows computers. flicks will work on any OS - modify the configuration any way you want - it's fairly self-explanatory but a full documentation will come within a few updates. There's no limit on how many functions you can implement. You can call entire scripts just like you would from the command line. Don't forget to restart server.js when you make changes to config.json!
 
 **Controls**
 
