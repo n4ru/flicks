@@ -5,14 +5,9 @@ Introducing **[flicks](http://n4ru.it/flicks/flicks.png)** - a watch app created
 
 flicks is a 3 part fully configurable and scriptable app that lets you quick launch anything on your computer or any device capable of running nodejs using just your Pebble.
 
-[PBW](http://n4ru.it/flicks/flicks.pbw)
-
-[Server](http://n4ru.it/flicks/flicks.rar)
-
 **What's the fastest way to get going?**
 
-- Install the PBW above. 
-- Download and extract the server.
+- Install the app. 
 - Launch the server by running "node server.js". 
 - Take note of the IP and save it to the watchapp settings. 
 - Ensure your phone is on the same network as the server.
