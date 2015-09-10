@@ -22,9 +22,9 @@ The config.js file is the meat of the application. It includes examples that sho
 **Controls**
 
 Here's the fun part. Upon boot, the Pebble will grab your configuration from the server and display the first one on the screen. To activate it - either flick your wrist or press select. You'll see a dot flash at the top right when you activate commands. When it goes away and the watch vibrates, execution was completed. You can cycle through your functions with the up/down buttons, and if you long-press select it will refresh the configuration from the server.
-*flicks runs on port 3939.*
+*flicks runs on port 3940 using WebSockets.*
 
-Make sure to report any issues! There's a lot of work to be done. Updates to come in the following days! 
+Make sure to report any issues! There's a lot of work to be done.
 Once bugs are ironed out and everything is good to go, it will be up on the app store.
 
 Features:
