@@ -1,7 +1,7 @@
 ![flicks](https://gitlab.com/n4ru/Flicks/raw/master/settings/flicks.png)
 
 
-Introducing **[flicks](http://n4ru.it/flicks/flicks.png)** - a watch app created to do whatever you want whenever you want - right on your wrist. 
+Introducing **[flicks](http://apps.getpebble.com/en_US/application/55d3560c704e4657a3000013)** - a watch app created to do whatever you want whenever you want - right on your wrist. 
 
 flicks is a 3 part fully configurable and scriptable app that lets you quick launch anything on your computer or any device capable of running nodejs using just your Pebble.
 
@@ -21,7 +21,7 @@ The config.json file is the meat of the application. It includes examples that s
 
 **Controls**
 
-Here's the fun part. Upon boot, the Pebble will grab your configuration from the server and display the first one on the screen. To activate it - either flick your wrist or press select. You'll see a dot flash at the top right when you activate commands. When it goes away and the watch vibrates, execution was completed. You can cycle through your functions with the up/down buttons, and if you long-press select it will refresh the configuration from the server.
+Here's the fun part. Upon boot, the Pebble will grab your configuration from the server and display the first one on the screen. To activate it - either flick your wrist or press select. You'll see a dot at the bottom right when you activate commands. When it goes away and the watch vibrates, execution was completed. You can cycle through your functions with the up/down buttons, and if you long-press select it will refresh the configuration from the server.
 *flicks runs on port 3940 using WebSockets.*
 
 Make sure to report any issues! There's a lot of work to be done.
